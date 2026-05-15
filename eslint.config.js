@@ -20,7 +20,25 @@ export default [
       "node_modules/**",
       "public/build/**", // Activos estáticos procesados
       "dist/**",
+      "playwright-report/**", // Reportes de pruebas E2E
+      "test-results/**", // Resultados de pruebas unitarias
+      "coverage/**", // Reportes de cobertura de tests
     ],
+  },
+
+  // CONFIGURACIÓN ESPECÍFICA PARA TESTS
+  {
+    // Aplicamos esto solo a archivos de prueba
+    files: ["**/__tests__/**/*.[jt]s?(x)", "**/*.test.[jt]s?(x)"],
+    languageOptions: {
+      globals: {
+        ...globals.jest, // 🚀 Esto le dice a ESLint que 'test' y 'expect' son legales
+      },
+    },
+    rules: {
+      // Opcional: puedes relajar algunas reglas en los tests
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   },
 
   // ⚙️ 2. REGLAS RECOMENDADAS DE JAVASCRIPT

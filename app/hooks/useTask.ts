@@ -55,6 +55,7 @@ export const useTaskDetailQuery = (id: string) => {
 export const useCreateTaskMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["createTask"],
     mutationFn: (taskData: Partial<Task>) => api.post("/tasks", taskData),
     onSuccess: () => {
       // Forzamos a la lista general a actualizarse
@@ -67,6 +68,7 @@ export const useCreateTaskMutation = () => {
 export const useDeleteTaskMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["deleteTask"],
     mutationFn: (id: string) => api.delete(`/tasks/${id}`),
     onSuccess: () => {
       // Al borrar, la lista del tablero debe refrescarse
@@ -79,6 +81,7 @@ export const useDeleteTaskMutation = () => {
 export const useAddCommentMutation = (taskId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["addComment", taskId],
     mutationFn: (content: string) =>
       api.post(`/tasks/${taskId}/comments`, { content, taskId }),
     onSuccess: () => {
@@ -93,6 +96,7 @@ export const useAddCommentMutation = (taskId: string) => {
 export const useDeleteCommentMutation = (taskId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["deleteComment", taskId],
     mutationFn: (commentId: string) =>
       api.delete(`/tasks/${taskId}/comments/${commentId}`),
     onSuccess: () => {
@@ -106,6 +110,7 @@ export const useDeleteCommentMutation = (taskId: string) => {
 export const useInviteMemberMutation = (taskId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["inviteMember", taskId],
     mutationFn: (email: string) =>
       api.post(`/tasks/${taskId}/invite`, { email }),
     onSuccess: () => {

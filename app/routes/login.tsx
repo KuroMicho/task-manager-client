@@ -68,8 +68,11 @@ export default function Login() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
-                Correo Institucional
+              <label
+                className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
+                htmlFor="email"
+              >
+                Correo Electrónico
               </label>
               <div className="relative">
                 <Mail
@@ -78,6 +81,7 @@ export default function Login() {
                 />
                 <input
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  id="email"
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ejemplo@itp.edu.co"
                   required
@@ -90,7 +94,10 @@ export default function Login() {
             {/* Password */}
             <div>
               <div className="flex justify-between mb-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  htmlFor="password"
+                >
                   Contraseña
                 </label>
                 <span className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 cursor-pointer">
@@ -104,6 +111,7 @@ export default function Login() {
                 />
                 <input
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  id="password"
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required

@@ -29,7 +29,17 @@ export const useLoginMutation = () => {
   });
 };
 
-// 3. Hook para Logout
+// 3. Hook para Registro
+export const useRegisterMutation = () => {
+  return useMutation({
+    mutationFn: (credentials: any) => api.post("/auth/register", credentials),
+    onSuccess: ({ data }) => {
+      console.log("Registro exitoso", data);
+    },
+  });
+};
+
+// 4. Hook para Logout
 export const useLogoutMutation = () => {
   const logoutStore = useAuthStore((s) => s.logout);
   return useMutation({

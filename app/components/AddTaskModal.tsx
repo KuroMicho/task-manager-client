@@ -62,11 +62,12 @@ export default function AddTaskModal() {
         {/* Formulario */}
         <form className="p-6 space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
+            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-title">
               Título
             </label>
             <input
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              id="task-title"
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ej. Calificar Laboratorio 1"
               required
@@ -76,11 +77,12 @@ export default function AddTaskModal() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
+            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-description">
               Descripción
             </label>
             <textarea
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24"
+              id="task-description"
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Detalles de la actividad..."
               value={description}
@@ -88,11 +90,12 @@ export default function AddTaskModal() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
+            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-priority">
               Prioridad
             </label>
             <select
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+              id="task-priority"
               onChange={(e) => setPriority(e.target.value)}
               value={priority}
             >

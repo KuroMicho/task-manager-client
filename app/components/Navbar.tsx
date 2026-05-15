@@ -14,6 +14,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 export default function Navbar() {
   const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export default function Navbar() {
         </Link>
 
         {/* Navegación Principal */}
-        {!isTasksPage && (
+        {!isTasksPage && isAuthenticated && (
           <div className="hidden md:flex items-center gap-4 text-sm font-medium leading-none">
             <Link
               className="opacity-70 hover:opacity-100 hover:text-indigo-500"

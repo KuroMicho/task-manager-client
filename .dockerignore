@@ -1,11 +1,31 @@
+// Ignorar dependencias locales
 node_modules
+npm-debug.log
+
+// Ignorar archivos de Git
 .git
 .gitignore
-.dockerignore
-build
-.env
-.env.*
-npm-debug.log
+
+// Ignorar documentación y herramientas de desarrollo
 README.md
 .vscode
-.DS_Store
+.dockerignore
+playwright.config.ts
+jest.config.ts
+app/jest-setup.ts
+
+// Ignorar carpetas de resultados de pruebas
+playwright/
+test-results/
+playwright-report/
+tests
+app/__tests__
+coverage
+
+// Ignorar archivos de construcción local
+build
+.react-router
+
+// Ignorar secretos (se deben pasar como variables de entorno en Render)
+.env
+.env.*
