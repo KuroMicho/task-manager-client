@@ -1,5 +1,6 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-const jestConfig = {
+import { defineConfig } from "jest";
+
+export default defineConfig({
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "jest-environment-jsdom",
   extensionsToTreatAsEsm: [".ts", ".tsx"],
@@ -31,6 +32,4 @@ const jestConfig = {
 
   // Ignora explícitamente la carpeta de Playwright
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/tests/"],
-};
-
-export default jestConfig;
+});
