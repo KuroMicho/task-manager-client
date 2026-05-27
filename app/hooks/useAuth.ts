@@ -1,51 +1,84 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import api from "../config/api";
 import { useAuthStore } from "../store/useAuthStore";
 
-// 1. Hook para verificar sesión (checkAuth)
+interface AuthResponse {
+  _id: string;
+  email: string;
+  name: string;
+}
+
+/**
+ * 1. Hook para verificar sesión activa (checkAuth)
+ * Protege las rutas e inyecta el usuario en Zustand si la cookie es válida.
+ */
 export const useCheckAuth = () => {
   const setUser = useAuthStore((s) => s.setUser);
-  return useQuery({
+
+  return useQuery<AuthResponse>({
     queryKey: ["auth-me"],
     queryFn: async () => {
-      const { data } = await api.get("/auth/me");
-      setUser(data); // Sincronizamos con Zustand
+      const { data } = await api.get<AuthResponse>("/auth/me");
+      setUser(data);
       return data;
     },
     retry: false,
-    staleTime: Infinity, // Solo lo pedimos una vez o cuando expire
+    gcTime: 0,
   });
 };
 
-// 2. Hook para Login
+/**
+ * 2. Hook para iniciar sesión (Login)
+ */
 export const useLoginMutation = () => {
   const setUser = useAuthStore((s) => s.setUser);
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (credentials: any) => api.post("/auth/login", credentials),
-    onSuccess: ({ data }) => {
+    mutationKey: ["auth-login"],
+    mutationFn: async (credentials: Record<string, string>) => {
+      const { data } = await api.post<AuthResponse>("/auth/login", credentials);
+      return data;
+    },
+    onSuccess: (data: AuthResponse) => {
+      queryClient.setQueryData(["auth-me"], data);
       setUser(data);
     },
   });
 };
 
-// 3. Hook para Registro
+/**
+ * 3. Hook para registro de usuarios (Register)
+ */
 export const useRegisterMutation = () => {
   return useMutation({
-    mutationFn: (credentials: any) => api.post("/auth/register", credentials),
-    onSuccess: ({ data }) => {
-      console.log("Registro exitoso", data);
+    mutationKey: ["auth-register"],
+    mutationFn: async (credentials: Record<string, string>) => {
+      const { data } = await api.post("/auth/register", credentials);
+      return data;
     },
+    onSuccess: () => {},
   });
 };
 
-// 4. Hook para Logout
+/**
+ * 4. Hook para cerrar sesión (Logout)
+ * Destruye de forma segura las cookies del server, el caché de TanStack y el estado de Zustand.
+ */
 export const useLogoutMutation = () => {
   const logoutStore = useAuthStore((s) => s.logout);
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: () => api.post("/auth/logout"),
+    mutationKey: ["auth-logout"],
+    mutationFn: async () => {
+      const { data } = await api.post("/auth/logout");
+      return data;
+    },
     onSettled: () => {
-      logoutStore(); // Limpiamos Zustand pase lo que pase
+      queryClient.clear();
+      logoutStore();
     },
   });
 };

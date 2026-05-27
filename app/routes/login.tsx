@@ -1,34 +1,42 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { AlertCircle, Loader2, Lock, LogIn, Mail } from "lucide-react";
+import type { AxiosError } from "axios";
+
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  LogIn,
+  Mail,
+} from "lucide-react";
 
 import { useLoginMutation } from "../hooks/useAuth";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // React Router and TanStack Query hooks
   const navigate = useNavigate();
-
-  // Usamos la mutación de TanStack
   const loginMutation = useLoginMutation();
 
-  // Extraemos el mensaje de error
+  // Local state hooks
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Estado para controlar la visibilidad
+
+  // Computed/derived state
   const errorMessage = loginMutation.error
-    ? (loginMutation.error as any).response?.data?.message ||
-      "Error al iniciar sesión"
+    ? (loginMutation.error as AxiosError<{ message?: string }>).response?.data
+        ?.message || "Error al iniciar sesión"
     : null;
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    try {
-      // Usamos mutateAsync para esperar la respuesta antes de navegar
-      await loginMutation.mutateAsync({ email, password });
-      navigate("/tasks");
-    } catch (err) {
-      // TanStack ya captura el error en loginMutation.error
-      console.error("Fallo en la autenticación");
-    }
+
+    // Usamos mutateAsync para esperar la respuesta antes de navegar
+    await loginMutation.mutateAsync({ email, password });
+    navigate("/tasks");
   };
 
   return (
@@ -104,20 +112,30 @@ export default function Login() {
                   ¿La olvidaste?
                 </span>
               </div>
+
               <div className="relative">
                 <Lock
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                   size={18}
                 />
+
                 <input
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                   id="password"
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Cambia dinámicamente el tipo
                   value={password}
                 />
+
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 transition-colors focus:outline-none cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 

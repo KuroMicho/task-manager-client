@@ -1,27 +1,30 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
+import type { AxiosError } from "axios";
+
 import { AlertCircle, Loader2, Lock, Mail, User, UserPlus } from "lucide-react";
 
 import { useRegisterMutation } from "../hooks/useAuth";
 
 export default function Register() {
+  // React Router and TanStack Query hooks
+  const navigate = useNavigate();
+  const registerMutation = useRegisterMutation();
+
+  // Local state hooks
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
-  const registerMutation = useRegisterMutation();
-
-  // Mensaje de error (del backend o validación del frontend)
+  // Computed/derived state
   const errorMessage =
     validationError ||
     (registerMutation.error
-      ? (registerMutation.error as any).response?.data?.message ||
-        "Error al crear la cuenta"
+      ? (registerMutation.error as AxiosError<{ message?: string }>).response
+          ?.data?.message || "Error al crear la cuenta"
       : null);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -38,15 +41,10 @@ export default function Register() {
       return;
     }
 
-    try {
-      // 2. Enviamos al backend
-      await registerMutation.mutateAsync({ name, email, password });
+    await registerMutation.mutateAsync({ name, email, password });
 
-      // 3. Redirigimos (dependiendo de tu flujo, puede ir directo a /tasks o al login)
-      navigate("/login");
-    } catch (err) {
-      console.error("Fallo en el registro", err);
-    }
+    // 3. Redirigimos (dependiendo de tu flujo, puede ir directo a /tasks o al login)
+    navigate("/login");
   };
 
   return (
@@ -86,7 +84,10 @@ export default function Register() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" htmlFor="name">
+              <label
+                className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300"
+                htmlFor="name"
+              >
                 Nombre Completo
               </label>
               <div className="relative">
@@ -108,7 +109,10 @@ export default function Register() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" htmlFor="email">
+              <label
+                className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300"
+                htmlFor="email"
+              >
                 Correo Electrónico
               </label>
               <div className="relative">
@@ -130,7 +134,10 @@ export default function Register() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" htmlFor="password">
+              <label
+                className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300"
+                htmlFor="password"
+              >
                 Contraseña
               </label>
               <div className="relative">
@@ -152,7 +159,10 @@ export default function Register() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300" htmlFor="confirmPassword">
+              <label
+                className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300"
+                htmlFor="confirmPassword"
+              >
                 Confirmar Contraseña
               </label>
               <div className="relative">

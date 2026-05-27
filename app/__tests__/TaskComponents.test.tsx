@@ -1,12 +1,14 @@
 import type React from "react";
 import { MemoryRouter } from "react-router";
 
+import type { DropResult } from "@hello-pangea/dnd";
+
 import { jest } from "@jest/globals";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import type { Task } from "../types/task";
+import type { Task } from "../@types/task";
 
 import {
   EmptyState,
@@ -43,7 +45,7 @@ describe("Task Components - Full Coverage", () => {
   // 1. Cobertura para TaskHeader
   test("TaskHeader: debe mostrar el título y el contador correctamente", () => {
     render(<TaskHeader onAddTask={() => {}} />);
-    expect(screen.getByText("Tablero de Proyectos")).toBeInTheDocument();
+    expect(screen.getByText("Tablero")).toBeInTheDocument();
     expect(
       screen.getByText("Gestiona tus tareas y colaboraciones en tiempo real."),
     ).toBeInTheDocument();
@@ -51,7 +53,14 @@ describe("Task Components - Full Coverage", () => {
 
   // 2. Cobertura para TaskList
   test('TaskList: debe mostrar el mensaje de "No hay tareas aún" cuando el array está vacío', () => {
-    renderWithProviders(<TaskList tasks={[]} />);
+    renderWithProviders(
+      <TaskList
+        onDragEnd={function (_: DropResult): void {
+          throw new Error("Function not implemented.");
+        }}
+        tasks={[]}
+      />,
+    );
     expect(screen.getByText(/No hay tareas aún/i)).toBeInTheDocument();
   });
 
@@ -66,10 +75,17 @@ describe("Task Components - Full Coverage", () => {
       },
     ];
 
-    renderWithProviders(<TaskList tasks={mockTasks} />);
+    renderWithProviders(
+      <TaskList
+        onDragEnd={function (_: DropResult): void {
+          throw new Error("Function not implemented.");
+        }}
+        tasks={mockTasks}
+      />,
+    );
 
     // Esto imprimirá el HTML actual en la terminal
-    screen.debug();
+    // screen.debug();
 
     // Verificamos que se renderice el título
     const taskTitle = await screen.findByText(/Aprender Testing/i);
@@ -91,7 +107,9 @@ describe("Task Components - Full Coverage", () => {
     ({ priority, expectedClass, title }) => {
       const task = createMockTask({ title, priority });
 
-      renderWithProviders(<TaskCard task={task} />);
+      renderWithProviders(
+        <TaskCard dragHandleProps={undefined} isDragging={false} task={task} />,
+      );
 
       expect(screen.getByText(title)).toBeInTheDocument();
 

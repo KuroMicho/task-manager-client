@@ -9,6 +9,13 @@
   --color-border: var(--border);
 }
 
+@layer base {
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #0f172a;

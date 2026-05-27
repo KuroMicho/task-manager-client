@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
 interface TaskUIState {
-  isAddTaskModalOpen: boolean;
+  isTaskModalOpen: boolean;
   searchQuery: string;
-  setAddTaskModal: (open: boolean) => void;
+  setTaskModal: (open: boolean) => void;
   setSearchQuery: (query: string) => void;
 }
 
 export const useTaskStore = create<TaskUIState>((set) => ({
-  isAddTaskModalOpen: false,
+  isTaskModalOpen: false,
   searchQuery: "",
-  setAddTaskModal: (open) => set({ isAddTaskModalOpen: open }),
+  setTaskModal: (open) => set({ isTaskModalOpen: open }),
   setSearchQuery: (query) => set({ searchQuery: query }),
 }));

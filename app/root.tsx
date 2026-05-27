@@ -13,7 +13,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import type { Route } from "./+types/root";
 
-import Navbar from "./components/Navbar";
+import Navbar from "./components/ui/Navbar";
+import { ToastContainer } from "./components/ui/ToastContainer";
 import { queryClient } from "./config/queryClient";
 import { ThemeProvider } from "./context/ThemeContext";
 import { useHydrated } from "./hooks/useHydrated";
@@ -89,6 +90,7 @@ export default function App() {
         <main className="flex-1 relative overflow-hidden">
           <Outlet />
         </main>
+        <ToastContainer />
       </div>
     </ThemeProvider>
   );

@@ -2,23 +2,35 @@ import { useState } from "react";
 
 import { Loader2, Plus, X } from "lucide-react";
 
-import { useCreateTaskMutation } from "../hooks/useTask";
-import { useTaskStore } from "../store/useTaskStore";
+import type { SelectOption } from "../ui/Select";
 
-export default function AddTaskModal() {
+import { useCreateTaskMutation } from "../../hooks/useTask";
+import { useTaskStore } from "../../store/useTaskStore";
+import { useToastStore } from "../../store/useToastStore";
+import Select from "../ui/Select";
+
+export function TaskModal() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
 
+  // Definimos el arreglo de opciones para la prioridad
+  const priorityOptions: SelectOption[] = [
+    { value: "low", label: "LOW - Baja (Opcional)" },
+    { value: "medium", label: "MID - Media (Semana actual)" },
+    { value: "high", label: "HIGH - Alta (Urgente)" },
+  ];
+
   // Sincronización con Zustand
-  const isAddTaskModalOpen = useTaskStore((state) => state.isAddTaskModalOpen);
-  const setAddTaskModal = useTaskStore((state) => state.setAddTaskModal);
+  const isTaskModalOpen = useTaskStore((state) => state.isTaskModalOpen);
+  const setTaskModal = useTaskStore((state) => state.setTaskModal);
+  const addToast = useToastStore((state) => state.addToast);
 
   // Mutación de TanStack
   const createTaskMutation = useCreateTaskMutation();
 
   // Si el store dice que está cerrado, no renderizamos nada
-  if (!isAddTaskModalOpen) return null;
+  if (!isTaskModalOpen) return null;
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -36,15 +48,17 @@ export default function AddTaskModal() {
       setTitle("");
       setDescription("");
       setPriority("medium");
-      setAddTaskModal(false);
-    } catch (error) {
-      console.error("Error al crear la tarea:", error);
+      setTaskModal(false);
+
+      addToast("Tarea creada exitosamente", "success");
+    } catch (_) {
+      addToast("Error al intentar guardar la tarea", "error");
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-visible animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -53,7 +67,7 @@ export default function AddTaskModal() {
           </h2>
           <button
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-            onClick={() => setAddTaskModal(false)}
+            onClick={() => setTaskModal(false)}
           >
             <X size={20} />
           </button>
@@ -62,7 +76,10 @@ export default function AddTaskModal() {
         {/* Formulario */}
         <form className="p-6 space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-title">
+            <label
+              className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
+              htmlFor="task-title"
+            >
               Título
             </label>
             <input
@@ -77,7 +94,10 @@ export default function AddTaskModal() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-description">
+            <label
+              className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
+              htmlFor="task-description"
+            >
               Descripción
             </label>
             <textarea
@@ -89,26 +109,17 @@ export default function AddTaskModal() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300" htmlFor="task-priority">
-              Prioridad
-            </label>
-            <select
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
-              id="task-priority"
-              onChange={(e) => setPriority(e.target.value)}
-              value={priority}
-            >
-              <option value="low">Baja (Opcional)</option>
-              <option value="medium">Media (Semana actual)</option>
-              <option value="high">Alta (Urgente)</option>
-            </select>
-          </div>
+          <Select
+            label="Prioridad"
+            onChange={(val) => setPriority(val)}
+            options={priorityOptions}
+            value={priority}
+          />
 
           <div className="flex gap-3 pt-4">
             <button
               className="flex-1 py-3 px-4 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-              onClick={() => setAddTaskModal(false)}
+              onClick={() => setTaskModal(false)}
               type="button"
             >
               Cancelar

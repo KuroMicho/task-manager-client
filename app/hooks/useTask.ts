@@ -77,6 +77,33 @@ export const useDeleteTaskMutation = () => {
   });
 };
 
+export const useReorderTasksMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reorderedTasks: any[]) => {
+      const idsOrder = reorderedTasks.map((task) => task._id);
+      const { data } = await api.post("/tasks/reorder", { idsOrder });
+      return data;
+    },
+    onMutate: async (reorderedTasks) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+      const previousTasks = queryClient.getQueryData(["tasks"]);
+
+      queryClient.setQueryData(["tasks"], reorderedTasks);
+
+      return { previousTasks };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(["tasks"], context.previousTasks);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
 /** Agregar comentario con refresco de caché */
 export const useAddCommentMutation = (taskId: string) => {
   const queryClient = useQueryClient();
@@ -100,7 +127,7 @@ export const useDeleteCommentMutation = (taskId: string) => {
     mutationFn: (commentId: string) =>
       api.delete(`/tasks/${taskId}/comments/${commentId}`),
     onSuccess: () => {
-    //   queryClient.invalidateQueries({ queryKey: ["task", taskId] });
+      //   queryClient.invalidateQueries({ queryKey: ["task", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });

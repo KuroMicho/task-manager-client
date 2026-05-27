@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 
-import InviteModal from "../components/InviteModal";
+import InviteModal from "../components/ui/InviteModal";
 import { socket } from "../config/socket"; // Importamos el singleton del socket
 import {
   useAddCommentMutation,
@@ -24,20 +24,25 @@ import {
   useDeleteTaskMutation,
   useTaskDetailQuery,
 } from "../hooks/useTask";
+import { useToastStore } from "../store/useToastStore";
 import { getPriorityStyles } from "../utils/theme-helpers";
 
 export default function TaskDetail() {
+  // Zustand global state hooks
+  const addToast = useToastStore((state) => state.addToast);
+
+  // React Router and TanStack Query hooks
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [commentText, setCommentText] = useState("");
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-
-  // 🚀 TANSTACK QUERIES & MUTATIONS
   const { data: task, isLoading, isError } = useTaskDetailQuery(id!);
   const deleteTaskMutation = useDeleteTaskMutation();
   const addCommentMutation = useAddCommentMutation(id!);
   const deleteCommentMutation = useDeleteCommentMutation(id!);
+
+  // Local state hooks
+  const [commentText, setCommentText] = useState("");
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // 🔌 LÓGICA DE SOCKETS (Sincronización con la caché de TanStack)
   useEffect(() => {
@@ -76,7 +81,26 @@ export default function TaskDetail() {
     }
   }, [id, queryClient]);
 
-  // Manejadores de acciones
+  // Computed/derived state
+  const hasComments = Boolean(task?.comments?.length);
+
+  // Event handlers
+  const handleBackToTasks = () => {
+    navigate("/tasks");
+  };
+
+  const handleOpenInviteModal = () => {
+    setIsInviteModalOpen(true);
+  };
+
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    deleteCommentMutation.mutate(commentId);
+  };
+
   const handleSendComment = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -84,8 +108,8 @@ export default function TaskDetail() {
     try {
       await addCommentMutation.mutateAsync(commentText);
       setCommentText("");
-    } catch (error) {
-      console.error("Error al enviar comentario");
+    } catch (_) {
+      addToast("Error al enviar comentario", "error");
     }
   };
 
@@ -94,9 +118,10 @@ export default function TaskDetail() {
 
     try {
       await deleteTaskMutation.mutateAsync(id!);
+      addToast("Tarea eliminada exitosamente", "success");
       navigate("/tasks");
-    } catch (error) {
-      alert("Error al eliminar la tarea");
+    } catch (_) {
+      addToast("Error al eliminar la tarea", "error");
     }
   };
 
@@ -120,7 +145,7 @@ export default function TaskDetail() {
         </h2>
         <button
           className="text-indigo-500 mt-4 font-bold"
-          onClick={() => navigate("/tasks")}
+          onClick={handleBackToTasks}
         >
           ← Volver al tablero
         </button>
@@ -133,19 +158,16 @@ export default function TaskDetail() {
       <div className="flex justify-between items-center mb-8">
         <button
           className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 group"
-          onClick={() => navigate("/tasks")}
+          onClick={handleBackToTasks}
         >
-          <ArrowLeft
-            className="group-hover:-translate-x-1 transition-transform"
-            size={18}
-          />
-          Volver al tablero
+          <ArrowLeft className="w-6 h-6 sm:w-4 sm:h-4 transform group-hover:-translate-x-1 transition-transform duration-200 text-slate-500 dark:text-slate-400 group-hover:text-current" />
+          <span className="hidden sm:block">Volver al tablero</span>
         </button>
 
         <div className="flex gap-2">
           <button
             className="flex items-center gap-2 text-sm font-bold bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-all"
-            onClick={() => setIsInviteModalOpen(true)}
+            onClick={handleOpenInviteModal}
           >
             <UserPlus size={18} /> Invitar
           </button>
@@ -241,7 +263,7 @@ export default function TaskDetail() {
         </h3>
 
         <div className="space-y-4">
-          {task.comments && task.comments.length > 0 ? (
+          {hasComments ? (
             task.comments.map((comment: any) => (
               <div
                 className="group bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-start"
@@ -263,7 +285,7 @@ export default function TaskDetail() {
 
                 <button
                   className="opacity-0 group-hover:opacity-100 p-2 text-slate-300 hover:text-red-500 rounded-lg transition-all"
-                  onClick={() => deleteCommentMutation.mutate(comment._id)}
+                  onClick={() => handleDeleteComment(comment._id)}
                 >
                   {deleteCommentMutation.isPending ? (
                     <Loader2 className="animate-spin" size={16} />
@@ -310,7 +332,7 @@ export default function TaskDetail() {
 
       <InviteModal
         isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
+        onClose={handleCloseInviteModal}
         taskId={id!}
       />
     </div>

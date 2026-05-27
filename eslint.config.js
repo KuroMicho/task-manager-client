@@ -11,7 +11,7 @@ import globals from "globals";
  * Estándar de calidad para React Router v7 y TypeScript
  */
 export default [
-  // 🚫 1. SECCIÓN DE IGNORADOS
+  // 1. SECCIÓN DE IGNORADOS
   // Evitamos que el linter pierda tiempo analizando archivos compilados o basura.
   {
     ignores: [
@@ -32,7 +32,7 @@ export default [
     files: ["**/__tests__/**/*.[jt]s?(x)", "**/*.test.[jt]s?(x)"],
     languageOptions: {
       globals: {
-        ...globals.jest, // 🚀 Esto le dice a ESLint que 'test' y 'expect' son legales
+        ...globals.jest, // Esto le dice a ESLint que 'test' y 'expect' son legales
       },
     },
     rules: {
@@ -41,10 +41,10 @@ export default [
     },
   },
 
-  // ⚙️ 2. REGLAS RECOMENDADAS DE JAVASCRIPT
+  // 2. REGLAS RECOMENDADAS DE JAVASCRIPT
   js.configs.recommended,
 
-  // 🛠️ 3. CONFIGURACIÓN PRINCIPAL (TS + REACT)
+  // 3. CONFIGURACIÓN PRINCIPAL (TS + REACT)
   {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
@@ -63,12 +63,14 @@ export default [
       perfectionist: perfectionist,
     },
     rules: {
-      // 📝 REGLAS DE REACT (Era React 19)
+      // REGLAS DE REACT (Era React 19)
       ...reactHooks.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "react/jsx-uses-react": "off", // No más 'import React' en cada archivo
       "react/react-in-jsx-scope": "off", // Gracias al compilador de React 19
 
-      // 🏛️ LÓGICA DE IMPORTACIONES (Plugin: Perfectionist)
+      // LÓGICA DE IMPORTACIONES (Plugin: Perfectionist)
       // Mantiene los imports ordenados por tipo y alfabéticamente.
       "perfectionist/sort-imports": [
         "error",
@@ -95,9 +97,7 @@ export default [
         },
       ],
 
-      // 🏷️ ESTÉTICA DE COMPONENTES (JSX Props)
-      // Ordena las props de los componentes (ej. <button className="" onClick="" />)
-      // ¡Mucho más fácil encontrar una prop en componentes grandes!
+      // ESTÉTICA DE COMPONENTES (JSX Props)
       "perfectionist/sort-jsx-props": [
         "error",
         {
@@ -107,20 +107,20 @@ export default [
         },
       ],
 
-      // 📤 ORDEN DE EXPORTACIONES
+      // ORDEN DE EXPORTACIONES
       "perfectionist/sort-exports": [
         "error",
         { type: "alphabetical", order: "asc" },
       ],
 
-      // 📦 ORDEN DE IMPORTACIONES NOMBRADAS
+      // ORDEN DE IMPORTACIONES NOMBRADAS
       // Ej: import { Button, Card, Input } from './components'
       "perfectionist/sort-named-imports": [
         "error",
         { type: "alphabetical", order: "asc" },
       ],
 
-      // 🧹 LIMPIEZA DE CÓDIGO (Smart Unused Vars)
+      // LIMPIEZA DE CÓDIGO (Smart Unused Vars)
       "no-unused-vars": "off", // Apagamos la de JS porque choca con TS
       "@typescript-eslint/no-unused-vars": [
         "warn",
@@ -131,7 +131,7 @@ export default [
         },
       ],
 
-      // 🚨 SEGURIDAD Y LOGS
+      // SEGURIDAD Y LOGS
       "no-console": ["warn", { allow: ["warn", "error"] }], // Evita dejar console.log en producción
     },
   },

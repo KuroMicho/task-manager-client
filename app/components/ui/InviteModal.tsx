@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 
-import { useInviteMemberMutation } from "../hooks/useTask";
+import { useInviteMemberMutation } from "../../hooks/useTask";
 
 interface Props {
   isOpen: boolean;
@@ -30,21 +30,16 @@ export default function InviteModal({ isOpen, onClose, taskId }: Props) {
     e.preventDefault();
     if (!email.trim()) return;
 
-    try {
-      await inviteMutation.mutateAsync(email);
+    await inviteMutation.mutateAsync(email);
 
-      // Manejo de éxito local para el feedback visual
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setEmail("");
-        onClose();
-        inviteMutation.reset(); // Limpia los estados de error de la mutación
-      }, 2000);
-    } catch (error) {
-      // El error lo maneja automáticamente TanStack Query en inviteMutation.error
-      console.error("Error al invitar colaborador");
-    }
+    // Manejo de éxito local para el feedback visual
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      setEmail("");
+      onClose();
+      inviteMutation.reset(); // Limpia los estados de error de la mutación
+    }, 2000);
   };
 
   return (
