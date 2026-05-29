@@ -2,43 +2,49 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+env:
+  VITE_API_URL: ${{ secrets.VITE_API_URL }}
+  VITE_SOCKET_URL: ${{ secrets.VITE_SOCKET_URL }}
+
+  VITE_APP_NAME: "Taskify ITP (CI)"
+  VITE_ENV: production
+  VITE_SHOW_QUERY_DEVTOOLS: false
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout del código
-      uses: actions/checkout@v4
+      - name: Checkout del código
+        uses: actions/checkout@v4
 
-    - name: Configurar Node.js 24.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24.x
-        cache: 'npm'
+      - name: Configurar Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
 
-    - name: Instalar dependencias del proyecto
-      run: npm ci
+      - name: Instalar dependencias del proyecto
+        run: npm ci
 
-    - name: Validar tipos de TypeScript (React Router Typegen + TSC)
-      # Ejecuta 'react-router typegen && tsc' para asegurar que las rutas typesafe existan antes de los tests
-      run: npm run typecheck
+      - name: Validar tipos de TypeScript (React Router Typegen + TSC)
+        run: npm run typecheck
 
-    - name: Ejecutar Linter
-      run: npm run lint
+      - name: Ejecutar Linter
+        run: npm run lint
 
-    - name: Ejecutar Pruebas Unitarias y de Integración (Jest)
-      run: npm run test
+      - name: Ejecutar Pruebas Unitarias y de Integración (Jest)
+        run: npm run test
 
-    - name: Instalar Navegadores de Playwright
-      # Descarga los binarios de ejecución ligeros para que las pruebas E2E no fallen en el servidor de GitHub
-      run: npx playwright install --with-deps
+      - name: Instalar Navegadores de Playwright
+        run: npx playwright install --with-deps
 
-    - name: Ejecutar Pruebas de Extremo a Extremo (Playwright E2E)
-      run: npm run test:e2e
+      - name: Ejecutar Pruebas de Extremo a Extremo (Playwright E2E)
+        run: npm run test:e2e
 
-    - name: Compilar Aplicación para Producción (Build)
-      run: npm run build
+      - name: Compilar Aplicación para Producción (Build)
+        run: npm run build

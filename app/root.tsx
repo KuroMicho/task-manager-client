@@ -66,7 +66,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           {children}
           <Suspense fallback={null}>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {import.meta.env.VITE_SHOW_QUERY_DEVTOOLS === "true" && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
           </Suspense>
         </QueryClientProvider>
         <ScrollRestoration />
