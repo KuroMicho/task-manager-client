@@ -8,7 +8,7 @@ setup("register and then login", async ({ page }) => {
   const userPassword = "Password123!";
 
   // --- PASO 1: REGISTRO ---
-  await page.goto("http://localhost:5173/register");
+  await page.goto("/register");
 
   await page.getByLabel(/Nombre/i).fill("Kevin Rodriguez");
   await page.getByLabel(/Correo/i).fill(userEmail);
