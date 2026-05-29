@@ -11,8 +11,8 @@ export default defineConfig({
   // Patrón para capturar archivos de pruebas y configuraciones globales
   testMatch: "**/*.{spec,setup}.ts",
 
-  // Tiempo límite global estricto por cada test individual (30 segundos)
-  timeout: 30000,
+  // Tiempo límite global estricto por cada test individual (10 segundos)
+  timeout: 10000,
 
   // Tiempo límite para aserciones de expect() (5 segundos)
   expect: {
