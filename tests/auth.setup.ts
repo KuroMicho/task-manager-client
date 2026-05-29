@@ -10,28 +10,33 @@ setup("register and then login", async ({ page }) => {
   // --- PASO 1: REGISTRO ---
   await page.goto("/register");
 
+  // Rellenar datos de registro
   await page.getByLabel(/Nombre/i).fill("Kevin Rodriguez");
   await page.getByLabel(/Correo/i).fill(userEmail);
-  await page.getByLabel(/^Contraseña$/i).fill(userPassword);
-  await page.getByLabel(/Confirmar Contraseña/i).fill(userPassword);
 
-  // Disparamos el clic pero no navegamos manualmente todavía
+  // Apuntamos directo a los IDs del DOM para fulminar la violación de modo estricto
+  await page.locator("#password").fill(userPassword);
+  await page.locator("#confirmPassword").fill(userPassword);
+
+  // Disparamos el clic de envío del formulario
   await page.getByRole("button", { name: /Crear Cuenta/i }).click();
 
-  // ESPERA DE SEGURIDAD:
-  await page.waitForURL(/login/i, { timeout: 15000 });
+  // Le damos un margen holgado por la latencia de la API de Render en el CI
+  await page.waitForURL("/login", { timeout: 20000 });
 
   // --- PASO 2: LOGIN ---
-  // Ahora que estamos seguros de que la cuenta existe y estamos en la página de login:
+  // Ahora que estamos seguros por URL de que estamos en la pantalla de Login:
   await page.getByLabel(/Correo/i).fill(userEmail);
-  await page.getByLabel(/Contraseña/i).fill(userPassword);
+  await page.locator("#password").fill(userPassword);
 
+  // Hacer clic para iniciar sesión
   await page.getByRole("button", { name: /Acceder al Tablero/i }).click();
 
-  // Esperamos a llegar al dashboard
-  await page.waitForURL(/tasks/i, { timeout: 15000 });
-  await expect(page).toHaveURL(/.*tasks/);
+  await page.waitForURL("/tasks", { timeout: 20000 });
 
-  // Guardamos el estado
+  // Verificación final del estado de la URL
+  await expect(page).toHaveURL(/\/tasks/);
+
+  // Guardamos el estado de autenticación (cookies y localStorage) de forma exitosa
   await page.context().storageState({ path: authFile });
 });

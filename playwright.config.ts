@@ -42,12 +42,10 @@ export default defineConfig({
     // Configuración semántica para ignorar fallos de certificados auto-firmados en local/contenedores
     ignoreHTTPSErrors: true,
 
-    // OPTIMIZACIÓN DE DISCO Y RENDIMIENTO EXTREMO:
     // Las capturas, videos y trazas consumen valiosos ciclos de CPU y RAM.
-    // Solo se generan si el test falla y entra en ciclo de REINTENTO. Si todo pasa en verde, el gasto es CERO.
-    trace: "retry-with-trace",
-    video: "on-first-retry",
-    screenshot: "only-on-failure",
+    trace: process.env.CI ? "off" : "retry-with-trace",
+    video: process.env.CI ? "off" : "on-first-retry",
+    screenshot: process.env.CI ? "off" : "only-on-failure",
   },
 
   /**
