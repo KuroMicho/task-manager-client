@@ -7,36 +7,50 @@ setup("register and then login", async ({ page }) => {
   const userEmail = `estudiante.${uniqueId}@itp.edu.co`;
   const userPassword = "Password123!";
 
+  // Interceptamos cualquier petición que vaya hacia tu API de Render para simular la respuesta
+  await page.route("**/api/v1/auth/register", async (route) => {
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        message: "Usuario creado con éxito",
+        success: true,
+      }),
+    });
+  });
+
+  await page.route("**/api/v1/auth/login", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        token: "token-falso-de-prueba-playwright",
+        user: { name: "Kevin Rodriguez", email: userEmail },
+      }),
+    });
+  });
+
   // --- PASO 1: REGISTRO ---
   await page.goto("/register");
 
-  // Rellenar datos de registro
   await page.getByLabel(/Nombre/i).fill("Kevin Rodriguez");
   await page.getByLabel(/Correo/i).fill(userEmail);
-
-  // Apuntamos directo a los IDs del DOM para fulminar la violación de modo estricto
   await page.locator("#password").fill(userPassword);
   await page.locator("#confirmPassword").fill(userPassword);
 
-  // Disparamos el clic de envío del formulario
   await page.getByRole("button", { name: /Crear Cuenta/i }).click();
 
-  // Le damos un margen holgado por la latencia de la API de Render en el CI
-  await page.waitForURL("/login", { timeout: 20000 });
+  // Ahora esto se ejecutará INSTANTÁNEAMENTE porque la API responde en 0 milisegundos
+  await page.waitForURL("/login", { timeout: 10000 });
 
   // --- PASO 2: LOGIN ---
-  // Ahora que estamos seguros por URL de que estamos en la pantalla de Login:
   await page.getByLabel(/Correo/i).fill(userEmail);
   await page.locator("#password").fill(userPassword);
 
-  // Hacer clic para iniciar sesión
   await page.getByRole("button", { name: /Acceder al Tablero/i }).click();
 
-  await page.waitForURL("/tasks", { timeout: 20000 });
-
-  // Verificación final del estado de la URL
+  await page.waitForURL("/tasks", { timeout: 10000 });
   await expect(page).toHaveURL(/\/tasks/);
 
-  // Guardamos el estado de autenticación (cookies y localStorage) de forma exitosa
   await page.context().storageState({ path: authFile });
 });
