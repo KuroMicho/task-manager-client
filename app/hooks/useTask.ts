@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import api from "../config/api";
+import { useToastStore } from "../store/useToastStore";
 import { sleep } from "../utils/sleep";
 
 export interface Task {
@@ -26,7 +27,7 @@ export interface Task {
 
 export const useTasksQuery = () => {
   return useQuery<Task[]>({
-    queryKey: ["tasks"], // Nombre de la caché
+    queryKey: ["tasks"],
     queryFn: async () => {
       const { data } = await api.get("/tasks");
       return data;
@@ -34,7 +35,6 @@ export const useTasksQuery = () => {
   });
 };
 
-// Fetch de una tarea por ID
 export const useTaskDetailQuery = (id: string) => {
   return useQuery({
     queryKey: ["task", id],
@@ -43,13 +43,9 @@ export const useTaskDetailQuery = (id: string) => {
       const { data } = await api.get(`/tasks/${id}`);
       return data;
     },
-    enabled: !!id, // Solo se ejecuta si hay un ID
+    enabled: !!id,
   });
 };
-
-// ---------------------------------------------------------
-// MUTATIONS (Modificación de datos)
-// ---------------------------------------------------------
 
 /** Crear una nueva tarea desde el modal */
 export const useCreateTaskMutation = () => {
@@ -58,7 +54,6 @@ export const useCreateTaskMutation = () => {
     mutationKey: ["createTask"],
     mutationFn: (taskData: Partial<Task>) => api.post("/tasks", taskData),
     onSuccess: () => {
-      // Forzamos a la lista general a actualizarse
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
@@ -71,35 +66,39 @@ export const useDeleteTaskMutation = () => {
     mutationKey: ["deleteTask"],
     mutationFn: (id: string) => api.delete(`/tasks/${id}`),
     onSuccess: () => {
-      // Al borrar, la lista del tablero debe refrescarse
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 };
 
+/** Drag and drop tareas */
 export const useReorderTasksMutation = () => {
+  const addToast = useToastStore((state) => state.addToast);
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (reorderedTasks: any[]) => {
+    mutationKey: ["tasks-reorder"],
+    mutationFn: async (reorderedTasks: Task[]) => {
       const idsOrder = reorderedTasks.map((task) => task._id);
       const { data } = await api.post("/tasks/reorder", { idsOrder });
       return data;
     },
     onMutate: async (reorderedTasks) => {
       await queryClient.cancelQueries({ queryKey: ["tasks"] });
-      const previousTasks = queryClient.getQueryData(["tasks"]);
+      const previousTasks = queryClient.getQueryData<Task[]>(["tasks"]);
 
-      queryClient.setQueryData(["tasks"], reorderedTasks);
+      queryClient.setQueryData(["tasks"], () => reorderedTasks);
 
       return { previousTasks };
     },
     onError: (_err, _variables, context) => {
       if (context?.previousTasks) {
         queryClient.setQueryData(["tasks"], context.previousTasks);
+        addToast("Error al reordenar", "error");
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    onSuccess: (data, reorderedTasks) => {
+      queryClient.setQueryData(["tasks"], () => reorderedTasks);
     },
   });
 };
@@ -112,8 +111,6 @@ export const useAddCommentMutation = (taskId: string) => {
     mutationFn: (content: string) =>
       api.post(`/tasks/${taskId}/comments`, { content, taskId }),
     onSuccess: () => {
-      // Refrescamos la tarea específica y la lista (por el commentCount)
-      // queryClient.invalidateQueries({ queryKey: ["task", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
@@ -127,7 +124,6 @@ export const useDeleteCommentMutation = (taskId: string) => {
     mutationFn: (commentId: string) =>
       api.delete(`/tasks/${taskId}/comments/${commentId}`),
     onSuccess: () => {
-      //   queryClient.invalidateQueries({ queryKey: ["task", taskId] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
@@ -141,7 +137,6 @@ export const useInviteMemberMutation = (taskId: string) => {
     mutationFn: (email: string) =>
       api.post(`/tasks/${taskId}/invite`, { email }),
     onSuccess: () => {
-      // Invalidamos para que la lista de miembros se actualice si la muestras en TaskDetail
       queryClient.invalidateQueries({ queryKey: ["task", taskId] });
     },
   });

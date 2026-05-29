@@ -24,7 +24,7 @@ export function TaskList({ tasks, onDragEnd }: TaskListProps) {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`grid gap-4 animate-in fade-in duration-500 rounded-2xl transition-colors ${
+            className={`flex flex-col gap-4 rounded-2xl transition-colors duration-200 ${
               snapshot.isDraggingOver
                 ? "bg-slate-100/60 dark:bg-slate-900/40"
                 : ""
@@ -37,7 +37,7 @@ export function TaskList({ tasks, onDragEnd }: TaskListProps) {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     className="select-none"
-                    style={{ ...provided.draggableProps.style }}
+                    style={provided.draggableProps.style}
                   >
                     <TaskCard
                       dragHandleProps={provided.dragHandleProps}

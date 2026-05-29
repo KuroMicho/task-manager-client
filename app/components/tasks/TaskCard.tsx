@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Link } from "react-router";
 
 import { ChevronRight, Clock, GripVertical, MessageSquare } from "lucide-react";
@@ -12,21 +13,24 @@ interface TaskCardProps {
   isDragging: boolean;
 }
 
-function getLabelColor(priority: Task["priority"]) {
-  switch (priority) {
-    case "high":
-      return "bg-red-500";
-    case "medium":
-      return "bg-amber-500";
-    case "low":
-      return "bg-cyan-500";
-  }
-}
+const PRIORITY_LABEL_COLORS: Record<Task["priority"], string> = {
+  high: "bg-red-500",
+  medium: "bg-amber-500",
+  low: "bg-cyan-500",
+};
 
-export function TaskCard({ task, dragHandleProps, isDragging }: TaskCardProps) {
+export const TaskCard = memo(function TaskCard({
+  task,
+  dragHandleProps,
+  isDragging,
+}: TaskCardProps) {
+  const formattedDate = useMemo(() => {
+    return new Date(task.createdAt).toLocaleDateString();
+  }, [task.createdAt]);
+
   return (
     <div
-      className={`group flex flex-col gap-4 rounded-2xl border bg-white p-5 pl-3 shadow-sm transition-all md:flex-row md:items-center md:justify-between w-full min-w-0 ${
+      className={`group flex flex-col gap-4 rounded-2xl border bg-white p-5 pl-3 shadow-sm transition-colors duration-200 md:flex-row md:items-center md:justify-between w-full min-w-0 ${
         isDragging
           ? "border-indigo-500 shadow-xl ring-4 ring-indigo-500/5 bg-slate-50/80 dark:bg-slate-900/90 scale-[1.01]"
           : "border-slate-200 hover:border-indigo-500 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
@@ -42,7 +46,7 @@ export function TaskCard({ task, dragHandleProps, isDragging }: TaskCardProps) {
         </div>
 
         <div
-          className={`h-12 w-1.5 shrink-0 rounded-full ${getLabelColor(task.priority)}`}
+          className={`h-12 w-1.5 shrink-0 rounded-full ${PRIORITY_LABEL_COLORS[task.priority]}`}
         />
 
         <div className="min-w-0 flex-1 w-full">
@@ -64,7 +68,7 @@ export function TaskCard({ task, dragHandleProps, isDragging }: TaskCardProps) {
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-1.5 whitespace-nowrap">
               <Clock size={14} />
-              <span>{new Date(task.createdAt).toLocaleDateString()}</span>
+              <span>{formattedDate}</span>
             </div>
             <div className="flex items-center gap-1.5 whitespace-nowrap">
               <MessageSquare size={14} />
@@ -86,4 +90,4 @@ export function TaskCard({ task, dragHandleProps, isDragging }: TaskCardProps) {
       </Link>
     </div>
   );
-}
+});

@@ -5,8 +5,8 @@ import path from "path";
 export const STORAGE_STATE = path.resolve("playwright/.auth/user.json");
 
 export default defineConfig({
-  // 🚀 Localización de los archivos de prueba
-  testDir: "./app/tests",
+  // Localización de los archivos de prueba
+  testDir: "./tests",
 
   // Solo reconoce archivos que terminen en .spec.ts o .setup.ts
   testMatch: "**/*.{spec,setup}.ts",
@@ -35,25 +35,25 @@ export default defineConfig({
   },
 
   /**
-   * 🏗️ CONFIGURACIÓN DE PROYECTOS
+   * CONFIGURACIÓN DE PROYECTOS
    * Aquí definimos la dependencia: setup -> chromium
    */
   projects: [
-    // 1️⃣ PROYECTO DE CONFIGURACIÓN (Auth)
+    // PROYECTO DE CONFIGURACIÓN (Auth)
     {
       name: "setup",
       testMatch: /auth\.setup\.ts/, // Solo ejecuta el archivo de registro/login
     },
 
-    // 2️⃣ PROYECTO PRINCIPAL (Navegador)
+    // PROYECTO PRINCIPAL (Navegador)
     {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        // 🎯 Inyecta la sesión guardada automáticamente
+        // Inyecta la sesión guardada automáticamente
         storageState: STORAGE_STATE,
       },
-      // 🔗 Obliga a que el proyecto 'setup' se ejecute con éxito antes
+      // Obliga a que el proyecto 'setup' se ejecute con éxito antes
       dependencies: ["setup"],
     },
 
@@ -71,7 +71,7 @@ export default defineConfig({
   ],
 
   /**
-   * 🌐 SERVIDOR WEB
+   * SERVIDOR WEB
    * Playwright encenderá tu app automáticamente antes de correr los tests.
    */
   webServer: {

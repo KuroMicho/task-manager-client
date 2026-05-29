@@ -18,7 +18,7 @@ setup("register and then login", async ({ page }) => {
   // Disparamos el clic pero no navegamos manualmente todavía
   await page.getByRole("button", { name: /Crear Cuenta/i }).click();
 
-  // ✋ ESPERA DE SEGURIDAD:
+  // ESPERA DE SEGURIDAD:
   await page.waitForURL("**/login", { timeout: 10000 });
 
   // --- PASO 2: LOGIN ---
