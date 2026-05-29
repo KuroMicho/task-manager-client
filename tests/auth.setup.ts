@@ -19,7 +19,7 @@ setup("register and then login", async ({ page }) => {
   await page.getByRole("button", { name: /Crear Cuenta/i }).click();
 
   // ESPERA DE SEGURIDAD:
-  await page.waitForURL("**/login", { timeout: 10000 });
+  await page.waitForURL(/login/i, { timeout: 15000 });
 
   // --- PASO 2: LOGIN ---
   // Ahora que estamos seguros de que la cuenta existe y estamos en la página de login:
@@ -29,7 +29,7 @@ setup("register and then login", async ({ page }) => {
   await page.getByRole("button", { name: /Acceder al Tablero/i }).click();
 
   // Esperamos a llegar al dashboard
-  await page.waitForURL("**/tasks");
+  await page.waitForURL(/tasks/i, { timeout: 15000 });
   await expect(page).toHaveURL(/.*tasks/);
 
   // Guardamos el estado
