@@ -32,6 +32,8 @@ export const useTasksQuery = () => {
       const { data } = await api.get("/tasks");
       return data;
     },
+    refetchOnWindowFocus: true,
+    staleTime: 5000,
   });
 };
 
@@ -44,6 +46,8 @@ export const useTaskDetailQuery = (id: string) => {
       return data;
     },
     enabled: !!id,
+    refetchOnWindowFocus: true,
+    staleTime: 5000,
   });
 };
 
